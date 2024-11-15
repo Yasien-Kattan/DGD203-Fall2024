@@ -1,0 +1,175 @@
+using System;
+using System.Collections.Generic;
+
+namespace CarZombieGame
+{
+    // Class car's engine (Electric Engine)
+    class Engine
+    {
+        public string Type { get; private set; }
+        public float Efficiency { get; private set; } // Power consumption per km
+
+        public Engine(string type, float efficiency)
+        {
+            Type = type;
+            Efficiency = efficiency;
+        }
+    }
+
+    // Class car's electric power (Battery)
+    class ElectricityPower
+    {
+        public float BatteryLevel { get; private set; }
+
+        public ElectricityPower(float initialLevel)
+        {
+            BatteryLevel = initialLevel;
+        }
+
+        public bool Consume(float amount)
+        {
+            if (BatteryLevel >= amount)
+            {
+                BatteryLevel -= amount;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    // Class representing the tires
+    class Tire
+    {
+        public string Type { get; private set; }
+        public int Durability { get; set; }
+
+        public Tire(string type, int durability)
+        {
+            Type = type;
+            Durability = durability;
+        }
+    }
+
+    // Class for the car, including engine, power, and tires
+    class Car
+    {
+        public Engine Engine { get; private set; }
+        public ElectricityPower Power { get; private set; }
+        public List<Tire> Tires { get; private set; }
+        public int Bullets { get; private set; }
+        public int Points { get; private set; }
+
+        public Car()
+        {
+            Engine = new Engine("Electric", 0.5f); // Energy efficiency
+            Power = new ElectricityPower(100.0f); // 100% battery
+            Tires = new List<Tire>
+            {
+                new Tire("All-Season", 100),
+                new Tire("All-Season", 100),
+                new Tire("All-Season", 100),
+                new Tire("All-Season", 100)
+            };
+            Bullets = 10;
+            Points = 0;
+        }
+
+        public bool Drive(int distance)
+        {
+            float powerNeeded = Engine.Efficiency * distance;
+
+            if (Power.Consume(powerNeeded))
+            {
+                Console.WriteLine($"Drove {distance} km. Remaining battery: {Power.BatteryLevel}%.");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("Not enough battery to drive!");
+                return false;
+            }
+        }
+
+        public void ShootAtZombies(List<Zombie> zombies)
+        {
+            Console.WriteLine($"Firing at {zombies.Count} zombie...");
+
+            for (int i = 0; i < zombies.Count; i++)
+            {
+                if (Bullets > 0)
+                {
+                    Bullets--;
+                    Console.WriteLine($"Shot fired at zombie {i + 1}! Bullets left: {Bullets}");
+                }
+                else
+                {
+                    Console.WriteLine("Out of bullets!");
+                    break;
+                }
+            }
+        }
+
+        public void EarnPoints(int value)
+        {
+            Points += value;
+            Console.WriteLine($"Earned {value} points! Total points: {Points}");
+        }
+
+        public void DetectZombies(List<Zombie> zombies)
+        {
+            Console.WriteLine($"Detected {zombies.Count} zombie at their coordinates:");
+            foreach (var zombie in zombies)
+            {
+                Console.WriteLine($"Zombie at X: {zombie.X}, Y: {zombie.Y}");
+            }
+        }
+    }
+
+    // Class representing a zombie
+    class Zombie
+    {
+        public int X { get; set; }
+        public int Y { get; set; }
+    }
+
+    // Main game loop
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Car car = new Car();
+
+            List<Zombie> zone1Zombies = new List<Zombie>
+            {
+                new Zombie { X = 10, Y = 20 },
+                new Zombie { X = 15, Y = 25 }
+            };
+
+            List<Zombie> zone2Zombies = new List<Zombie>
+            {
+                new Zombie { X = 30, Y = 40 }
+            };
+
+            Console.WriteLine("Starting journey to Zone X...");
+
+            // Zone 1
+            Console.WriteLine("\nEntering Zone 1...");
+            car.Drive(20); // Drive distance 
+            car.DetectZombies(zone1Zombie); // Show zombie coordinates during detection
+            car.ShootAtZombies(zone1Zombie); // Shoot at zombies
+            car.EarnPoints(50); // Earn points 
+
+            // Zone 2
+            Console.WriteLine("\nEntering Zone 2...");
+            car.Drive(30); // Drive distance 
+            car.DetectZombies(zone2Zombie); // Show zombie coordinates during detection
+            car.ShootAtZombies(zone2Zombie); // Shoot at zombies
+            car.EarnPoints(100); // Earn points 
+
+
+            // Safe Zone (Zone X)
+            Console.WriteLine("\nReached Zone X!");
+            Console.WriteLine($"Final Points: {car.Points}, Remaining Bullets: {car.Bullets}, Remaining Battery: {car.Power.BatteryLevel}%.");
+        }
+    }
+}
